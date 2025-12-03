@@ -57,6 +57,10 @@
     <h1>Quote of the Day</h1>
     <p id="quote">Click the button to see a quote.</p>
     <button id="new-quote">New quote</button>
+<br><br>
+<button id="favourite">❤️ Save favourite</button>
+<p id="saved"></p>
+
   </div>
 
   <script>
@@ -69,12 +73,26 @@
     ];
 
     const quoteElement = document.getElementById("quote");
+    const favouriteButton = document.getElementById("favourite");
+const savedText = document.getElementById("saved");
+
     const button = document.getElementById("new-quote");
 
     function showRandomQuote() {
       const index = Math.floor(Math.random() * quotes.length);
       quoteElement.textContent = quotes[index];
     }
+favouriteButton.addEventListener("click", () => {
+  const currentQuote = quoteElement.textContent;
+  localStorage.setItem("favouriteQuote", currentQuote);
+  savedText.textContent = "Saved!";
+});
+const savedQuote = localStorage.getItem("favouriteQuote");
+
+if (savedQuote) {
+  savedText.textContent = "⭐ Favourite saved:";
+  quoteElement.textContent = savedQuote;
+}
 
     button.addEventListener("click", showRandomQuote);
   </script>
