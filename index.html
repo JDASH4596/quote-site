@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Quote of the Day</title>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      min-height: 100vh;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
+    }
+
+    #quote {
+      font-size: 1rem;
+      line-height: 1.5;
+      margin-bottom: 1.5rem;
+      color: #333;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      background: #111827;
+      color: white;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Quote of the Day</h1>
+    <p id="quote">Click the button to see a quote.</p>
+    <button id="new-quote">New quote</button>
+  </div>
+
+  <script>
+    const quotes = [
+      "Life is really simple, but we insist on making it complicated.",
+      "The present moment is all you ever have.",
+      "You are not a drop in the ocean. You are the entire ocean in a drop.",
+      "What you seek is seeking you.",
+      "Silence is a source of great strength."
+    ];
+
+    const quoteElement = document.getElementById("quote");
+    const button = document.getElementById("new-quote");
+
+    function showRandomQuote() {
+      const index = Math.floor(Math.random() * quotes.length);
+      quoteElement.textContent = quotes[index];
+    }
+
+    button.addEventListener("click", showRandomQuote);
+  </script>
+</body>
+</html>
