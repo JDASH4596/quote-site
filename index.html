@@ -60,6 +60,10 @@
 <br><br>
 <button id="favourite">❤️ Save favourite</button>
 <p id="saved"></p>
+    <textarea id="customQuote" placeholder="Write your own quote..." rows="3" style="width:100%; margin-top:1rem;"></textarea>
+<br><br>
+<button id="addQuote">Add quote</button>
+
 <br>
 <button id="viewFavourite">View favourite</button>
 
@@ -79,6 +83,8 @@ const button = document.getElementById("new-quote");
 const favouriteButton = document.getElementById("favourite");
 const savedText = document.getElementById("saved");
 const viewButton = document.getElementById("viewFavourite");
+const addButton = document.getElementById("addQuote");
+const input = document.getElementById("customQuote");
 
 function showRandomQuote() {
   const index = Math.floor(Math.random() * quotes.length);
@@ -105,7 +111,27 @@ favouriteButton.addEventListener("click", () => {
 viewButton.addEventListener("click", () => {
   window.location.href = "favourite.html";
 });
+addButton.addEventListener("click", () => {
+  const newQuote = input.value.trim();
+
+  if (!newQuote) {
+    savedText.textContent = "Write something first!";
+    return;
+  }
+
+  let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
+
+  if (!favourites.includes(newQuote)) {
+    favourites.push(newQuote);
+    localStorage.setItem("favouritesList", JSON.stringify(favourites));
+    savedText.textContent = "Quote added!";
+    input.value = "";
+  } else {
+    savedText.textContent = "Already in favourites!";
+  }
+});
 
   </script>
+  
 </body>
 </html>
