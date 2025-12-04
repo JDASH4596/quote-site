@@ -79,6 +79,7 @@
     <button id="new-quote">New quote</button>
     <button id="favourite">❤️ Save favourite</button>
 <button id="deleteQuote">🗑️ Delete this quote</button>
+<button id="openBin">♻️ Recycle bin</button>
 
     <p id="saved"></p>
 
@@ -149,6 +150,10 @@
     const newQuoteButton = document.getElementById("new-quote");
     const favouriteButton = document.getElementById("favourite");
     const deleteButton = document.getElementById("deleteQuote");
+const binButton = document.getElementById("openBin");
+binButton.addEventListener("click", () => {
+  window.location.href = "bin.html";
+});
 
     const savedText = document.getElementById("saved");
     const viewButton = document.getElementById("viewFavourite");
@@ -236,7 +241,40 @@
     viewButton.addEventListener("click", () => {
       window.location.href = "favourite.html";
     });
-    deleteButton.addEventListener("click", () => {
+  deleteButton.addEventListener("click", () => {
+  if (currentIndex === null) {
+    savedText.textContent = "No quote to delete.";
+    return;
+  }
+
+  const quoteToDelete = allQuotes[currentIndex];
+
+  // Load recycle bin
+  let recycleBin = JSON.parse(localStorage.getItem("recycleBin")) || [];
+  recycleBin.push(quoteToDelete);
+  localStorage.setItem("recycleBin", JSON.stringify(recycleBin));
+
+  // Remove from main list
+  allQuotes.splice(currentIndex, 1);
+  localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
+
+  // Remove from favourites
+  let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
+  favourites = favourites.filter(q => q !== quoteToDelete);
+  localStorage.setItem("favouritesList", JSON.stringify(favourites));
+
+  // Reset rotation
+  resetOrder();
+
+  if (allQuotes.length > 0) {
+    showNextQuote();
+  } else {
+    quoteElement.textContent = "No quotes left.";
+  }
+
+  savedText.textContent = "Moved to recycle bin.";
+});
+
   if (currentIndex === null) {
     savedText.textContent = "No quote to delete.";
     return;
