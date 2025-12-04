@@ -112,6 +112,26 @@ if (!Array.isArray(allQuotes) || allQuotes.length === 0) {
   allQuotes = Array.isArray(legacy) && legacy.length ? legacy : defaultQuotes.slice();
   localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
 }
+localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
+// ---- MIGRATE OLD FAVOURITES INTO MAIN ROTATION (ONCE) ----
+let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
+
+let migrated = false;
+
+favourites.forEach(q => {
+  if (!allQuotes.includes(q)) {
+    allQuotes.push(q);
+    migrated = true;
+  }
+});
+
+if (migrated) {
+  localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
+
+  // reset order if we added anything
+  localStorage.removeItem("quoteOrder");
+  localStorage.removeItem("quoteOrderIndex");
+}
 
 // ---- DOM ----
 const quoteElement = document.getElementById("quote");
