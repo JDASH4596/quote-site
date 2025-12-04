@@ -81,20 +81,26 @@ const viewButton = document.getElementById("viewFavourite");
 
     const button = document.getElementById("new-quote");
 
-    function showRandomQuote() {
-      const index = Math.floor(Math.random() * quotes.length);
-      quoteElement.textContent = quotes[index];
-    }
+   function showRandomQuote() {
+  const index = Math.floor(Math.random() * quotes.length);
+  quoteElement.textContent = quotes[index];
+  savedText.textContent = "";
+}
+
 favouriteButton.addEventListener("click", () => {
   const currentQuote = quoteElement.textContent;
-  localStorage.setItem("favouriteQuote", currentQuote);
-  savedText.textContent = "Saved!";
-});
-const savedQuote = localStorage.getItem("favouriteQuote");
 
-if (savedQuote) {
-  savedText.textContent = "⭐ Favourite saved:";
-  quoteElement.textContent = savedQuote;
+  let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
+
+  if (!favourites.includes(currentQuote)) {
+    favourites.push(currentQuote);
+    localStorage.setItem("favouritesList", JSON.stringify(favourites));
+    savedText.textContent = "Saved!";
+  } else {
+    savedText.textContent = "Already saved!";
+  }
+});
+
 }
 viewButton.addEventListener("click", () => {
   window.location.href = "favourite.html";
