@@ -81,5 +81,118 @@
 
     <p id="saved"></p>
 
-    <text
+    <textarea
+      id="customQuote"
+      placeholder="Write your own quote..."
+      rows="3"
+      style="width:100%; margin-top:1rem;"
+    ></textarea>
+    <br><br>
+    <button id="addQuote">Add quote</button>
+    <br><br>
+    <button id="viewFavourite">View favourite</button>
+  </div>
+
+  <script>
+    // default quotes used the first time
+    const defaultQuotes = [
+      "Life is really simple, but we insist on making it complicated.",
+      "The present moment is all you ever have.",
+      "You are not a drop in the ocean. You are the entire ocean in a drop.",
+      "What you seek is seeking you.",
+      "Silence is a source of great strength."
+    ];
+
+    // load quotes from storage or fall back to defaults
+    let quotes =
+      JSON.parse(localStorage.getItem("quotesList")) || defaultQuotes;
+
+    // cache DOM elements
+    const quoteElement = document.getElementById("quote");
+    const button = document.getElementById("new-quote");
+    const favouriteButton = document.getElementById("favourite");
+    const savedText = document.getElementById("saved");
+    const viewButton = document.getElementById("viewFavourite");
+    const addButton = document.getElementById("addQuote");
+    const input = document.getElementById("customQuote");
+
+    function saveQuotesToStorage() {
+      localStorage.setItem("quotesList", JSON.stringify(quotes));
+    }
+
+    function showRandomQuote() {
+      if (!quotes || quotes.length === 0) {
+        quotes = defaultQuotes;
+        saveQuotesToStorage();
+      }
+      const index = Math.floor(Math.random() * quotes.length);
+      quoteElement.textContent = quotes[index];
+      savedText.textContent = "";
+    }
+
+    button.addEventListener("click", showRandomQuote);
+
+    favouriteButton.addEventListener("click", () => {
+      const currentQuote = quoteElement.textContent.trim();
+      if (!currentQuote || currentQuote === "Click the button to see a quote.") {
+        savedText.textContent = "Show a quote first!";
+        return;
+      }
+
+      let favourites =
+        JSON.parse(localStorage.getItem("favouritesList")) || [];
+
+      if (!favourites.includes(currentQuote)) {
+        favourites.push(currentQuote);
+        localStorage.setItem(
+          "favouritesList",
+          JSON.stringify(favourites)
+        );
+        savedText.textContent = "Saved!";
+      } else {
+        savedText.textContent = "Already saved!";
+      }
+    });
+
+    addButton.addEventListener("click", () => {
+      const newQuote = input.value.trim();
+
+      if (!newQuote) {
+        savedText.textContent = "Write something first!";
+        return;
+      }
+
+      // update main quotes list
+      let quotesList =
+        JSON.parse(localStorage.getItem("quotesList")) || quotes;
+
+      if (!quotesList.includes(newQuote)) {
+        quotesList.push(newQuote);
+        localStorage.setItem("quotesList", JSON.stringify(quotesList));
+      }
+
+      quotes = quotesList;
+
+      // also add to favourites
+      let favourites =
+        JSON.parse(localStorage.getItem("favouritesList")) || [];
+      if (!favourites.includes(newQuote)) {
+        favourites.push(newQuote);
+        localStorage.setItem(
+          "favouritesList",
+          JSON.stringify(favourites)
+        );
+      }
+
+      quoteElement.textContent = newQuote;
+      savedText.textContent = "Quote added!";
+      input.value = "";
+    });
+
+    viewButton.addEventListener("click", () => {
+      window.location.href = "favourite.html";
+    });
+  </script>
+</body>
+</html>
 
