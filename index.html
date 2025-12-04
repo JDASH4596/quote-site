@@ -78,6 +78,7 @@
 
     <button id="new-quote">New quote</button>
     <button id="favourite">❤️ Save favourite</button>
+<button id="deleteQuote">🗑️ Delete this quote</button>
 
     <p id="saved"></p>
 
@@ -147,6 +148,8 @@
     const quoteElement = document.getElementById("quote");
     const newQuoteButton = document.getElementById("new-quote");
     const favouriteButton = document.getElementById("favourite");
+    const deleteButton = document.getElementById("deleteQuote");
+
     const savedText = document.getElementById("saved");
     const viewButton = document.getElementById("viewFavourite");
     const addButton = document.getElementById("addQuote");
@@ -233,6 +236,36 @@
     viewButton.addEventListener("click", () => {
       window.location.href = "favourite.html";
     });
+    deleteButton.addEventListener("click", () => {
+  if (currentIndex === null) {
+    savedText.textContent = "No quote to delete.";
+    return;
+  }
+
+  const quoteToDelete = allQuotes[currentIndex];
+
+  // Remove from main quotes
+  allQuotes.splice(currentIndex, 1);
+  localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
+
+  // Remove from favourites
+  let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
+  favourites = favourites.filter(q => q !== quoteToDelete);
+  localStorage.setItem("favouritesList", JSON.stringify(favourites));
+
+  // Reset rotation order
+  resetOrder();
+
+  // Show next quote or fallback
+  if (allQuotes.length > 0) {
+    showNextQuote();
+  } else {
+    quoteElement.textContent = "No quotes left.";
+  }
+
+  savedText.textContent = "Deleted.";
+});
+
   </script>
 </body>
 </html>
