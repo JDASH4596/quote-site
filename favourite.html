@@ -41,21 +41,36 @@
   <div class="box">
     <h1>Your Favourite Quote</h1>
     <p id="favDisplay">No favourite saved yet.</p>
+    <button onclick="nextQuote()">Next favourite</button>
+
     <button onclick="goHome()">Back</button>
   </div>
 
-  <script>
-    const favourite = localStorage.getItem("favouriteQuote");
-    const display = document.getElementById("favDisplay");
+let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
+let index = 0;
 
-    if (favourite) {
-      display.textContent = favourite;
-    }
+const display = document.getElementById("favDisplay");
 
-    function goHome() {
-      window.location.href = "index.html";
-    }
-  </script>
+function showFavourite() {
+  if (favourites.length === 0) {
+    display.textContent = "No favourites saved yet.";
+  } else {
+    display.textContent = favourites[index];
+  }
+}
+
+function nextQuote() {
+  if (favourites.length === 0) return;
+  index = (index + 1) % favourites.length;
+  showFavourite();
+}
+
+showFavourite();
+
+function goHome() {
+  window.location.href = "index.html";
+}
+
 
 </body>
 </html>
