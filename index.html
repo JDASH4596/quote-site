@@ -20,7 +20,8 @@
       padding: 2rem;
       border-radius: 12px;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
+      max-width: 420px;
+      width: 100%;
       text-align: center;
     }
 
@@ -34,6 +35,7 @@
       line-height: 1.5;
       margin-bottom: 1.5rem;
       color: #333;
+      min-height: 3em;
     }
 
     button {
@@ -45,10 +47,27 @@
       font-weight: 600;
       background: #111827;
       color: white;
+      margin: 0.25rem;
     }
 
     button:hover {
       opacity: 0.9;
+    }
+
+    textarea {
+      font-family: inherit;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      resize: vertical;
+    }
+
+    #saved {
+      min-height: 1.2em;
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 0.5rem;
     }
   </style>
 </head>
@@ -56,113 +75,11 @@
   <div class="card">
     <h1>Quote of the Day</h1>
     <p id="quote">Click the button to see a quote.</p>
+
     <button id="new-quote">New quote</button>
-<br><br>
-<button id="favourite">❤️ Save favourite</button>
-<p id="saved"></p>
-    <textarea id="customQuote" placeholder="Write your own quote..." rows="3" style="width:100%; margin-top:1rem;"></textarea>
-<br><br>
-<button id="addQuote">Add quote</button>
+    <button id="favourite">❤️ Save favourite</button>
 
-<br>
-<button id="viewFavourite">View favourite</button>
+    <p id="saved"></p>
 
-  </div>
-  
-  <script>
- let quotes = JSON.parse(localStorage.getItem("quotesList")) || [
-  "Life is really simple, but we insist on making it complicated.",
-  "The present moment is all you ever have.",
-  "You are not a drop in the ocean. You are the entire ocean in a drop.",
-  "What you seek is seeking you.",
-  "Silence is a source of great strength."
-];
+    <text
 
-
-const quoteElement = document.getElementById("quote");
-const button = document.getElementById("new-quote");
-const favouriteButton = document.getElementById("favourite");
-const savedText = document.getElementById("saved");
-const viewButton = document.getElementById("viewFavourite");
-const addButton = document.getElementById("addQuote");
-const input = document.getElementById("customQuote");
-
-function showRandomQuote() {
-  quotes = JSON.parse(localStorage.getItem("quotesList")) || quotes;
-  const index = Math.floor(Math.random() * quotes.length);
-  quoteElement.textContent = quotes[index];
-  savedText.textContent = "";
-}
-
-
-button.addEventListener("click", showRandomQuote);
-
-favouriteButton.addEventListener("click", () => {
-  const currentQuote = quoteElement.textContent;
-
- addButton.addEventListener("click", () => {
-  const newQuote = input.value.trim();
-
-  if (!newQuote) {
-    savedText.textContent = "Write something first!";
-    return;
-  }
-
-  let quotesList = JSON.parse(localStorage.getItem("quotesList")) || quotes;
-  let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
-
-  if (!quotesList.includes(newQuote)) {
-    quotesList.push(newQuote);
-    localStorage.setItem("quotesList", JSON.stringify(quotesList));
-  }
-
-  if (!favourites.includes(newQuote)) {
-    favourites.push(newQuote);
-    localStorage.setItem("favouritesList", JSON.stringify(favourites));
-  }
-
-  quotes = quotesList;
-  quoteElement.textContent = newQuote;
-  savedText.textContent = "Quote added!";
-  input.value = "";
-});
-
-
-  if (!favourites.includes(currentQuote)) {
-    favourites.push(currentQuote);
-    localStorage.setItem("favouritesList", JSON.stringify(favourites));
-    savedText.textContent = "Saved!";
-  } else {
-    savedText.textContent = "Already saved!";
-  }
-});
-
-viewButton.addEventListener("click", () => {
-  window.location.href = "favourite.html";
-});
-addButton.addEventListener("click", () => {
-  const newQuote = input.value.trim();
-
-  if (!newQuote) {
-    savedText.textContent = "Write something first!";
-    return;
-  }
-
-  let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
-
-  if (!favourites.includes(newQuote)) {
-    favourites.push(newQuote);
-    localStorage.setItem("favouritesList", JSON.stringify(favourites));
-quoteElement.textContent = newQuote;
-savedText.textContent = "Quote added!";
-
-    input.value = "";
-  } else {
-    savedText.textContent = "Already in favourites!";
-  }
-});
-
-  </script>
-  
-</body>
-</html>
