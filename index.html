@@ -124,7 +124,9 @@ addButton.addEventListener("click", () => {
   if (!favourites.includes(newQuote)) {
     favourites.push(newQuote);
     localStorage.setItem("favouritesList", JSON.stringify(favourites));
-    savedText.textContent = "Quote added!";
+quoteElement.textContent = newQuote;
+savedText.textContent = "Quote added!";
+
     input.value = "";
   } else {
     savedText.textContent = "Already in favourites!";
