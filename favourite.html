@@ -40,37 +40,38 @@
 
   <div class="box">
     <h1>Your Favourite Quote</h1>
-    <p id="favDisplay">No favourite saved yet.</p>
-    <button onclick="nextQuote()">Next favourite</button>
+    <p id="favDisplay">Loading...</p>
 
+    <button onclick="nextQuote()">Next favourite</button>
     <button onclick="goHome()">Back</button>
   </div>
 
-let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
-let index = 0;
+  <script>
+    let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
+    let index = 0;
+    const display = document.getElementById("favDisplay");
 
-const display = document.getElementById("favDisplay");
+    function showFavourite() {
+      if (favourites.length === 0) {
+        display.textContent = "No favourites saved yet.";
+      } else {
+        display.textContent = favourites[index];
+      }
+    }
 
-function showFavourite() {
-  if (favourites.length === 0) {
-    display.textContent = "No favourites saved yet.";
-  } else {
-    display.textContent = favourites[index];
-  }
-}
+    function nextQuote() {
+      if (favourites.length === 0) return;
+      index = (index + 1) % favourites.length;
+      showFavourite();
+    }
 
-function nextQuote() {
-  if (favourites.length === 0) return;
-  index = (index + 1) % favourites.length;
-  showFavourite();
-}
+    function goHome() {
+      window.location.href = "index.html";
+    }
 
-showFavourite();
-
-function goHome() {
-  window.location.href = "index.html";
-}
-
+    showFavourite();
+  </script>
 
 </body>
+
 </html>
