@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Recycle Bin</title>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #111827;
+      color: white;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .box {
+      background: rgba(255,255,255,0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 450px;
+      width: 100%;
+      text-align: center;
+    }
+
+    p {
+      min-height: 3em;
+    }
+
+    button {
+      margin: 0.4rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .restore { background: #16a34a; color: white; }
+    .delete { background: #dc2626; color: white; }
+    .back { background: #e5e7eb; color: #111827; }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>Recycle Bin</h1>
+    <p id="binDisplay">Loading...</p>
+
+    <button class="restore" onclick="restoreQuote()">Restore</button>
+    <button class="delete" onclick="deleteForever()">Delete forever</button>
+    <br><br>
+    <button class="back" onclick="goBack()">Back</button>
+  </div>
+
+  <script>
+    let recycleBin = JSON.parse(localStorage.getItem("recycleBin")) || [];
+    let index = 0;
+    const display = document.getElementById("binDisplay");
+
+    function show() {
+      if (recycleBin.length === 0) {
+        display.textContent = "Recycle bin is empty.";
+      } else {
+        display.textContent = recycleBin[index];
+      }
+    }
+
+    function restoreQuote() {
+      if (recycleBin.length === 0) return;
+
+      let allQuotes = JSON.parse(localStorage.getItem("allQuotes")) || [];
+
+      const restored = recycleBin.splice(index, 1)[0];
+      allQuotes.push(restored);
+
+      localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
+      localStorage.setItem("recycleBin", JSON.stringify(recycleBin));
+
+      index = 0;
+      show();
+    }
+
+    function deleteForever() {
+      if (recycleBin.length === 0) return;
+
+      recycleBin.splice(index, 1);
+      localStorage.setItem("recycleBin", JSON.stringify(recycleBin));
+
+      if (index >= recycleBin.length) index = 0;
+      show();
+    }
+
+    function goBack() {
+      window.location.href = "index.html";
+    }
+
+    show();
+  </script>
+
+</body>
+</html>
