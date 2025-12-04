@@ -67,25 +67,26 @@
   
   <script>
     const quotes = [
-      "Life is really simple, but we insist on making it complicated.",
-      "The present moment is all you ever have.",
-      "You are not a drop in the ocean. You are the entire ocean in a drop.",
-      "What you seek is seeking you.",
-      "Silence is a source of great strength."
-    ];
+  "Life is really simple, but we insist on making it complicated.",
+  "The present moment is all you ever have.",
+  "You are not a drop in the ocean. You are the entire ocean in a drop.",
+  "What you seek is seeking you.",
+  "Silence is a source of great strength."
+];
 
-    const quoteElement = document.getElementById("quote");
-    const favouriteButton = document.getElementById("favourite");
+const quoteElement = document.getElementById("quote");
+const button = document.getElementById("new-quote");
+const favouriteButton = document.getElementById("favourite");
 const savedText = document.getElementById("saved");
 const viewButton = document.getElementById("viewFavourite");
 
-    const button = document.getElementById("new-quote");
-
-   function showRandomQuote() {
+function showRandomQuote() {
   const index = Math.floor(Math.random() * quotes.length);
   quoteElement.textContent = quotes[index];
   savedText.textContent = "";
 }
+
+button.addEventListener("click", showRandomQuote);
 
 favouriteButton.addEventListener("click", () => {
   const currentQuote = quoteElement.textContent;
@@ -101,12 +102,10 @@ favouriteButton.addEventListener("click", () => {
   }
 });
 
-}
 viewButton.addEventListener("click", () => {
   window.location.href = "favourite.html";
 });
 
-    button.addEventListener("click", showRandomQuote);
   </script>
 </body>
 </html>
