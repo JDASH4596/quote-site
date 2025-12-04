@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Favourite Quote</title>
+
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #111827;
+      margin: 0;
+      display: flex;
+      min-height: 100vh;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+
+    .box {
+      background: rgba(255,255,255,0.05);
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      padding: 0.6rem 1.2rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: white;
+      color: #111827;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="box">
+    <h1>Your Favourite Quote</h1>
+    <p id="favDisplay">No favourite saved yet.</p>
+    <button onclick="goHome()">Back</button>
+  </div>
+
+  <script>
+    const favourite = localStorage.getItem("favouriteQuote");
+    const display = document.getElementById("favDisplay");
+
+    if (favourite) {
+      display.textContent = favourite;
+    }
+
+    function goHome() {
+      window.location.href = "index.html";
+    }
+  </script>
+
+</body>
+</html>
