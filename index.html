@@ -96,213 +96,147 @@
   </div>
 
   <script>
-    // ---- DEFAULT QUOTES (first-time only) ----
-    const defaultQuotes = [
-      "Life is really simple, but we insist on making it complicated.",
-      "The present moment is all you ever have.",
-      "You are not a drop in the ocean. You are the entire ocean in a drop.",
-      "What you seek is seeking you.",
-      "Silence is a source of great strength."
-    ];
+  // ---- DEFAULT QUOTES ----
+const defaultQuotes = [
+  "Life is really simple, but we insist on making it complicated.",
+  "The present moment is all you ever have.",
+  "You are not a drop in the ocean. You are the entire ocean in a drop.",
+  "What you seek is seeking you.",
+  "Silence is a source of great strength."
+];
 
-    // ---- LOAD ALL QUOTES (including any older ones we saved before) ----
-    let allQuotes = JSON.parse(localStorage.getItem("allQuotes"));
-    if (!Array.isArray(allQuotes) || allQuotes.length === 0) {
-      // try migrate from older key if it exists
-      const legacy = JSON.parse(localStorage.getItem("quotesList"));
-      if (Array.isArray(legacy) && legacy.length > 0) {
-        allQuotes = legacy;
-      } else {
-        allQuotes = defaultQuotes.slice();
-      }
-    }
+// ---- LOAD ALL QUOTES (MIGRATE OLD DATA SAFELY) ----
+let allQuotes = JSON.parse(localStorage.getItem("allQuotes"));
+if (!Array.isArray(allQuotes) || allQuotes.length === 0) {
+  const legacy = JSON.parse(localStorage.getItem("quotesList"));
+  allQuotes = Array.isArray(legacy) && legacy.length ? legacy : defaultQuotes.slice();
+  localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
+}
 
-    function saveAllQuotes() {
-      localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
-    }
-
-    // ---- NON-REPEATING ORDER ("shuffle bag") ----
-    let order = JSON.parse(localStorage.getItem("quoteOrder"));
-    let orderIndex = parseInt(localStorage.getItem("quoteOrderIndex") || "0", 10);
-
-    function resetOrder() {
-      order = [];
-      for (let i = 0; i < allQuotes.length; i++) {
-        order.push(i);
-      }
-      // Fisher–Yates shuffle
-      for (let i = order.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [order[i], order[j]] = [order[j], order[i]];
-      }
-      orderIndex = 0;
-      localStorage.setItem("quoteOrder", JSON.stringify(order));
-      localStorage.setItem("quoteOrderIndex", String(orderIndex));
-    }
-
-    // if order is broken or length doesn't match, reset
-    if (!Array.isArray(order) || order.length !== allQuotes.length) {
-      resetOrder();
-    }
-
-    // ---- DOM ELEMENTS ----
-    const quoteElement = document.getElementById("quote");
-    const newQuoteButton = document.getElementById("new-quote");
-    const favouriteButton = document.getElementById("favourite");
-    const deleteButton = document.getElementById("deleteQuote");
+// ---- DOM ----
+const quoteElement = document.getElementById("quote");
+const newQuoteButton = document.getElementById("new-quote");
+const favouriteButton = document.getElementById("favourite");
+const deleteButton = document.getElementById("deleteQuote");
+const savedText = document.getElementById("saved");
+const viewButton = document.getElementById("viewFavourite");
+const addButton = document.getElementById("addQuote");
+const input = document.getElementById("customQuote");
 const binButton = document.getElementById("openBin");
-binButton.addEventListener("click", () => {
-  window.location.href = "bin.html";
+
+// ---- NON-REPEATING ORDER ----
+function resetOrder() {
+  const order = allQuotes.map((_, i) => i);
+  for (let i = order.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  localStorage.setItem("quoteOrder", JSON.stringify(order));
+  localStorage.setItem("quoteOrderIndex", "0");
+  return order;
+}
+
+let order = JSON.parse(localStorage.getItem("quoteOrder"));
+let orderIndex = parseInt(localStorage.getItem("quoteOrderIndex") || "0", 10);
+if (!Array.isArray(order) || order.length !== allQuotes.length) {
+  order = resetOrder();
+  orderIndex = 0;
+}
+
+let currentIndex = null;
+
+function showNextQuote() {
+  if (!allQuotes.length) {
+    quoteElement.textContent = "No quotes left.";
+    return;
+  }
+  if (orderIndex >= order.length) {
+    order = resetOrder();
+    orderIndex = 0;
+  }
+  currentIndex = order[orderIndex];
+  quoteElement.textContent = allQuotes[currentIndex];
+  savedText.textContent = "";
+  orderIndex++;
+  localStorage.setItem("quoteOrderIndex", String(orderIndex));
+}
+
+newQuoteButton.addEventListener("click", showNextQuote);
+
+// ---- FAVOURITES ----
+favouriteButton.addEventListener("click", () => {
+  const q = quoteElement.textContent.trim();
+  if (!q || q === "Click the button to see a quote.") {
+    savedText.textContent = "Show a quote first!";
+    return;
+  }
+  let fav = JSON.parse(localStorage.getItem("favouritesList")) || [];
+  if (!fav.includes(q)) {
+    fav.push(q);
+    localStorage.setItem("favouritesList", JSON.stringify(fav));
+    savedText.textContent = "Saved!";
+  } else {
+    savedText.textContent = "Already saved!";
+  }
 });
 
-    const savedText = document.getElementById("saved");
-    const viewButton = document.getElementById("viewFavourite");
-    const addButton = document.getElementById("addQuote");
-    const input = document.getElementById("customQuote");
+// ---- ADD CUSTOM QUOTE ----
+addButton.addEventListener("click", () => {
+  const q = input.value.trim();
+  if (!q) {
+    savedText.textContent = "Write something first!";
+    return;
+  }
+  if (!allQuotes.includes(q)) {
+    allQuotes.push(q);
+    localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
+    order.push(allQuotes.length - 1); // add to rotation without breaking order
+    localStorage.setItem("quoteOrder", JSON.stringify(order));
+  }
+  // also add to favourites
+  let fav = JSON.parse(localStorage.getItem("favouritesList")) || [];
+  if (!fav.includes(q)) {
+    fav.push(q);
+    localStorage.setItem("favouritesList", JSON.stringify(fav));
+  }
+  quoteElement.textContent = q;
+  input.value = "";
+  savedText.textContent = "Quote added!";
+});
 
-    // track what is currently shown (by index)
-    let currentIndex = null;
-
-    function showNextQuote() {
-      if (!Array.isArray(order) || order.length === 0) {
-        resetOrder();
-      }
-      if (orderIndex >= order.length) {
-        // we've shown all quotes once; start a new shuffled cycle
-        resetOrder();
-      }
-      const idx = order[orderIndex];
-      currentIndex = idx;
-      quoteElement.textContent = allQuotes[idx];
-      savedText.textContent = "";
-      orderIndex++;
-      localStorage.setItem("quoteOrderIndex", String(orderIndex));
-    }
-
-    newQuoteButton.addEventListener("click", showNextQuote);
-
-    // ---- SAVE FAVOURITE (current quote text) ----
-    favouriteButton.addEventListener("click", () => {
-      const currentQuote = quoteElement.textContent.trim();
-      if (!currentQuote || currentQuote === "Click the button to see a quote.") {
-        savedText.textContent = "Show a quote first!";
-        return;
-      }
-
-      let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
-
-      if (!favourites.includes(currentQuote)) {
-        favourites.push(currentQuote);
-        localStorage.setItem("favouritesList", JSON.stringify(favourites));
-        savedText.textContent = "Saved!";
-      } else {
-        savedText.textContent = "Already saved!";
-      }
-    });
-
-    // ---- ADD A NEW CUSTOM QUOTE ----
-    addButton.addEventListener("click", () => {
-      const newQuote = input.value.trim();
-
-      if (!newQuote) {
-        savedText.textContent = "Write something first!";
-        return;
-      }
-
-      // add to main quote pool if not already there
-      if (!allQuotes.includes(newQuote)) {
-        allQuotes.push(newQuote);
-        saveAllQuotes();
-
-        // also add its index into the order so it will appear in the cycle
-        const newIndex = allQuotes.length - 1;
-        if (!Array.isArray(order)) {
-          order = [];
-        }
-        order.push(newIndex);
-        localStorage.setItem("quoteOrder", JSON.stringify(order));
-      }
-
-      // also add to favourites
-      let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
-      if (!favourites.includes(newQuote)) {
-        favourites.push(newQuote);
-        localStorage.setItem("favouritesList", JSON.stringify(favourites));
-      }
-
-      // show the new quote immediately
-      currentIndex = allQuotes.length - 1;
-      quoteElement.textContent = newQuote;
-      savedText.textContent = "Quote added!";
-      input.value = "";
-    });
-
-    // ---- NAVIGATE TO FAVOURITES PAGE ----
-    viewButton.addEventListener("click", () => {
-      window.location.href = "favourite.html";
-    });
-  deleteButton.addEventListener("click", () => {
+// ---- DELETE -> RECYCLE BIN ----
+deleteButton.addEventListener("click", () => {
   if (currentIndex === null) {
     savedText.textContent = "No quote to delete.";
     return;
   }
 
-  const quoteToDelete = allQuotes[currentIndex];
+  const q = allQuotes[currentIndex];
 
-  // Load recycle bin
-  let recycleBin = JSON.parse(localStorage.getItem("recycleBin")) || [];
-  recycleBin.push(quoteToDelete);
-  localStorage.setItem("recycleBin", JSON.stringify(recycleBin));
+  let bin = JSON.parse(localStorage.getItem("recycleBin")) || [];
+  bin.push(q);
+  localStorage.setItem("recycleBin", JSON.stringify(bin));
 
-  // Remove from main list
+  // remove from main list
   allQuotes.splice(currentIndex, 1);
   localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
 
-  // Remove from favourites
-  let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
-  favourites = favourites.filter(q => q !== quoteToDelete);
-  localStorage.setItem("favouritesList", JSON.stringify(favourites));
+  // remove from favourites
+  let fav = JSON.parse(localStorage.getItem("favouritesList")) || [];
+  fav = fav.filter(x => x !== q);
+  localStorage.setItem("favouritesList", JSON.stringify(fav));
 
-  // Reset rotation
-  resetOrder();
+  // reset rotation cleanly
+  order = resetOrder();
+  orderIndex = 0;
 
-  if (allQuotes.length > 0) {
-    showNextQuote();
-  } else {
-    quoteElement.textContent = "No quotes left.";
-  }
-
+  showNextQuote();
   savedText.textContent = "Moved to recycle bin.";
 });
 
-  if (currentIndex === null) {
-    savedText.textContent = "No quote to delete.";
-    return;
-  }
-
-  const quoteToDelete = allQuotes[currentIndex];
-
-  // Remove from main quotes
-  allQuotes.splice(currentIndex, 1);
-  localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
-
-  // Remove from favourites
-  let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
-  favourites = favourites.filter(q => q !== quoteToDelete);
-  localStorage.setItem("favouritesList", JSON.stringify(favourites));
-
-  // Reset rotation order
-  resetOrder();
-
-  // Show next quote or fallback
-  if (allQuotes.length > 0) {
-    showNextQuote();
-  } else {
-    quoteElement.textContent = "No quotes left.";
-  }
-
-  savedText.textContent = "Deleted.";
-});
+// ---- NAVIGATION ----
+viewButton.addEventListener("click", () => window.location.href = "favourite.html");
+binButton.addEventListener("click", () => window.location.href = "bin.html");
 
   </script>
 </body>
