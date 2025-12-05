@@ -16,6 +16,15 @@
 
 .card {
   <button id="toggleEdit" style="float:right; background:#e5e7eb; color:#111;">Edit</button>
+<button id="toggleEdit" style="float:right;background:#e5e7eb;color:#111">Edit</button>
+
+<div id="editPanel" style="display:none;margin-top:1rem;text-align:left">
+  <input id="titleInput" placeholder="Title" style="width:100%"><br><br>
+  <input type="color" id="bgPicker"> Background<br><br>
+  <input type="color" id="buttonPicker"> Buttons<br><br>
+  <input id="emojiInput" placeholder="Emoji 😊">
+  <button id="applyEmoji">Apply</button>
+</div>
 
   background: rgba(255,255,255,0.8);
   backdrop-filter: blur(20px);
@@ -284,6 +293,50 @@ deleteButton.addEventListener("click", () => {
 // ---- NAVIGATION ----
 viewButton.addEventListener("click", () => window.location.href = "favourite.html");
 binButton.addEventListener("click", () => window.location.href = "bin.html");
+// ==== EDIT MODE (SAFE ADD-ON) ====
+const toggleEdit = document.getElementById("toggleEdit");
+const editPanel = document.getElementById("editPanel");
+const titleInput = document.getElementById("titleInput");
+const bgPicker = document.getElementById("bgPicker");
+const buttonPicker = document.getElementById("buttonPicker");
+const emojiInput = document.getElementById("emojiInput");
+const applyEmoji = document.getElementById("applyEmoji");
+const title = document.querySelector("h1");
+
+const settings = JSON.parse(localStorage.getItem("siteSettings")) || {};
+if (settings.title) title.textContent = settings.title;
+if (settings.bg) document.body.style.background = settings.bg;
+if (settings.buttonColor) document.querySelectorAll("button").forEach(b => b.style.background = settings.buttonColor);
+if (settings.emoji) title.textContent = settings.emoji + " " + (settings.title || "Quote of the Day");
+
+toggleEdit.addEventListener("click", () => {
+  editPanel.style.display = editPanel.style.display === "none" ? "block" : "none";
+});
+
+titleInput.addEventListener("input", () => {
+  settings.title = titleInput.value;
+  title.textContent = titleInput.value;
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+});
+
+bgPicker.addEventListener("change", () => {
+  settings.bg = bgPicker.value;
+  document.body.style.background = settings.bg;
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+});
+
+buttonPicker.addEventListener("change", () => {
+  settings.buttonColor = buttonPicker.value;
+  document.querySelectorAll("button").forEach(b => b.style.background = settings.buttonColor);
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+});
+
+applyEmoji.addEventListener("click", () => {
+  if (!emojiInput.value) return;
+  settings.emoji = emojiInput.value;
+  title.textContent = settings.emoji + " " + (settings.title || "Quote of the Day");
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+});
 
 
   </script>
