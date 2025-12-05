@@ -15,6 +15,8 @@
 }
 
 .card {
+  <button id="toggleEdit" style="float:right; background:#e5e7eb; color:#111;">Edit</button>
+
   background: rgba(255,255,255,0.8);
   backdrop-filter: blur(20px);
   padding: 24px;
@@ -71,6 +73,22 @@ button:active {
   transform: scale(0.97);
   box-shadow: 0 4px 8px rgba(0,122,255,0.15);
 }
+<div id="editPanel" style="display:none; margin-top:1rem; text-align:left;">
+  <h3>Edit Mode</h3>
+
+  <label>Title</label><br>
+  <input type="text" id="titleInput" placeholder="Change title"><br><br>
+
+  <label>Button colour</label><br>
+  <input type="color" id="buttonPicker"><br><br>
+
+  <label>Background colour</label><br>
+  <input type="color" id="bgPicker"><br><br>
+
+  <label>Emoji</label><br>
+  <input type="text" id="emojiInput" placeholder="😊"><br>
+  <button id="applyEmoji">Apply Emoji</button>
+</div>
 
 textarea {
   width: 100%;
@@ -339,8 +357,68 @@ applyEmoji.addEventListener("click", () => {
     title.textContent = emoji + " Quote of the Day";
   }
 });
+const toggleEdit = document.getElementById("toggleEdit");
+const editPanel = document.getElementById("editPanel");
+const titleInput = document.getElementById("titleInput");
+const bgPicker = document.getElementById("bgPicker");
+const buttonPicker = document.getElementById("buttonPicker");
+const emojiInput = document.getElementById("emojiInput");
+const applyEmoji = document.getElementById("applyEmoji");
+const title = document.querySelector("h1");
+// ----- TOGGLE EDIT PANEL -----
+toggleEdit.addEventListener("click", () => {
+  editPanel.style.display =
+    editPanel.style.display === "none" ? "block" : "none";
+});
+
+// ----- SETTINGS -----
+const settings = JSON.parse(localStorage.getItem("siteSettings")) || {};
+
+// Load settings
+if (settings.title) title.textContent = settings.title;
+if (settings.bg) document.body.style.background = settings.bg;
+
+if (settings.buttonColor) {
+  document.querySelectorAll("button").forEach(btn => {
+    btn.style.background = settings.buttonColor;
+    btn.style.color = "white";
+  });
+}
+
+// TITLE CHANGE
+titleInput.addEventListener("input", () => {
+  settings.title = titleInput.value;
+  title.textContent = titleInput.value;
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+});
+
+// BACKGROUND COLOUR
+bgPicker.addEventListener("change", () => {
+  settings.bg = bgPicker.value;
+  document.body.style.background = settings.bg;
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+});
+
+// BUTTON COLOUR
+buttonPicker.addEventListener("change", () => {
+  settings.buttonColor = buttonPicker.value;
+  document.querySelectorAll("button").forEach(btn => {
+    btn.style.background = settings.buttonColor;
+  });
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+});
+
+// EMOJI
+applyEmoji.addEventListener("click", () => {
+  if (emojiInput.value) {
+    settings.emoji = emojiInput.value;
+    title.textContent = settings.emoji + " " + (settings.title || "Quote of the Day");
+    localStorage.setItem("siteSettings", JSON.stringify(settings));
+  }
+});
 
   </script>
+  
 </body>
 </html>
 
