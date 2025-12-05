@@ -118,6 +118,24 @@ textarea {
 </head>
 <body>
   <div class="card">
+    <button id="toggleEdit" style="float:right; background:#e5e7eb; color:#111;">Edit</button>
+
+<div id="editPanel" style="display:none; margin-top:1rem; text-align:left;">
+  <h3>Edit Mode</h3>
+
+  <input id="titleInput" placeholder="Change title" style="width:100%"><br><br>
+
+  <label>Background</label><br>
+  <input type="color" id="bgPicker"><br><br>
+
+  <label>Buttons</label><br>
+  <input type="color" id="buttonPicker"><br><br>
+
+  <label>Emoji</label><br>
+  <input id="emojiInput" placeholder="😊">
+  <button id="applyEmoji">Apply</button>
+</div>
+
     <h1>Quote of the Day</h1>
     <p id="quote">Click the button to see a quote.</p>
 
