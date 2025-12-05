@@ -132,7 +132,7 @@ textarea {
   </div>
 
   <script>
-  // ---- DEFAULT QUOTES ----
+ // ---- DEFAULT QUOTES ----
 const defaultQuotes = [
   "Life is really simple, but we insist on making it complicated.",
   "The present moment is all you ever have.",
@@ -141,30 +141,25 @@ const defaultQuotes = [
   "Silence is a source of great strength."
 ];
 
-// ---- LOAD ALL QUOTES (MIGRATE OLD DATA SAFELY) ----
+// ---- LOAD ALL QUOTES (MIGRATE OLD DATA) ----
 let allQuotes = JSON.parse(localStorage.getItem("allQuotes"));
 if (!Array.isArray(allQuotes) || allQuotes.length === 0) {
   const legacy = JSON.parse(localStorage.getItem("quotesList"));
   allQuotes = Array.isArray(legacy) && legacy.length ? legacy : defaultQuotes.slice();
   localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
 }
-localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
-// ---- MIGRATE OLD FAVOURITES INTO MAIN ROTATION (ONCE) ----
-let favourites = JSON.parse(localStorage.getItem("favouritesList")) || [];
 
+// ---- IMPORT OLD FAVOURITES INTO MAIN ROTATION (ONE-TIME) ----
+let favs = JSON.parse(localStorage.getItem("favouritesList")) || [];
 let migrated = false;
-
-favourites.forEach(q => {
+favs.forEach(q => {
   if (!allQuotes.includes(q)) {
     allQuotes.push(q);
     migrated = true;
   }
 });
-
 if (migrated) {
   localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
-
-  // reset order if we added anything
   localStorage.removeItem("quoteOrder");
   localStorage.removeItem("quoteOrderIndex");
 }
@@ -246,10 +241,9 @@ addButton.addEventListener("click", () => {
   if (!allQuotes.includes(q)) {
     allQuotes.push(q);
     localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
-    order.push(allQuotes.length - 1); // add to rotation without breaking order
+    order.push(allQuotes.length - 1);
     localStorage.setItem("quoteOrder", JSON.stringify(order));
   }
-  // also add to favourites
   let fav = JSON.parse(localStorage.getItem("favouritesList")) || [];
   if (!fav.includes(q)) {
     fav.push(q);
@@ -273,16 +267,13 @@ deleteButton.addEventListener("click", () => {
   bin.push(q);
   localStorage.setItem("recycleBin", JSON.stringify(bin));
 
-  // remove from main list
   allQuotes.splice(currentIndex, 1);
   localStorage.setItem("allQuotes", JSON.stringify(allQuotes));
 
-  // remove from favourites
   let fav = JSON.parse(localStorage.getItem("favouritesList")) || [];
   fav = fav.filter(x => x !== q);
   localStorage.setItem("favouritesList", JSON.stringify(fav));
 
-  // reset rotation cleanly
   order = resetOrder();
   orderIndex = 0;
 
@@ -293,129 +284,7 @@ deleteButton.addEventListener("click", () => {
 // ---- NAVIGATION ----
 viewButton.addEventListener("click", () => window.location.href = "favourite.html");
 binButton.addEventListener("click", () => window.location.href = "bin.html");
-const bgPicker = document.getElementById("bgPicker");
-const buttonPicker = document.getElementById("buttonPicker");
-const imagePicker = document.getElementById("imagePicker");
-const emojiInput = document.getElementById("emojiInput");
-const applyEmoji = document.getElementById("applyEmoji");
-const title = document.querySelector("h1");
-// ---- LOAD SETTINGS ----
-const settings = JSON.parse(localStorage.getItem("siteSettings")) || {};
 
-if (settings.bg) document.body.style.background = settings.bg;
-
-if (settings.buttonColor) {
-  document.querySelectorAll("button").forEach(b => {
-    b.style.background = settings.buttonColor;
-  });
-}
-
-if (settings.image) {
-  document.body.style.background = `url(${settings.image}) center / cover no-repeat`;
-}
-
-if (settings.emoji) {
-  title.textContent = settings.emoji + " Quote of the Day";
-}
-
-// ---- SAVE BACKGROUND COLOUR ----
-bgPicker.addEventListener("change", () => {
-  settings.bg = bgPicker.value;
-  localStorage.setItem("siteSettings", JSON.stringify(settings));
-  document.body.style.background = settings.bg;
-});
-
-// ---- SAVE BUTTON COLOUR ----
-buttonPicker.addEventListener("change", () => {
-  settings.buttonColor = buttonPicker.value;
-  localStorage.setItem("siteSettings", JSON.stringify(settings));
-  document.querySelectorAll("button").forEach(b => {
-    b.style.background = settings.buttonColor;
-  });
-});
-
-// ---- IMAGE UPLOAD ----
-imagePicker.addEventListener("change", () => {
-  const file = imagePicker.files[0];
-  const reader = new FileReader();
-
-  reader.onload = function(e) {
-    settings.image = e.target.result;
-    localStorage.setItem("siteSettings", JSON.stringify(settings));
-    document.body.style.background = `url(${settings.image}) center / cover no-repeat`;
-  };
-
-  reader.readAsDataURL(file);
-});
-
-// ---- TITLE EMOJI ----
-applyEmoji.addEventListener("click", () => {
-  const emoji = emojiInput.value.trim();
-  if (emoji) {
-    settings.emoji = emoji;
-    localStorage.setItem("siteSettings", JSON.stringify(settings));
-    title.textContent = emoji + " Quote of the Day";
-  }
-});
-const toggleEdit = document.getElementById("toggleEdit");
-const editPanel = document.getElementById("editPanel");
-const titleInput = document.getElementById("titleInput");
-const bgPicker = document.getElementById("bgPicker");
-const buttonPicker = document.getElementById("buttonPicker");
-const emojiInput = document.getElementById("emojiInput");
-const applyEmoji = document.getElementById("applyEmoji");
-const title = document.querySelector("h1");
-// ----- TOGGLE EDIT PANEL -----
-toggleEdit.addEventListener("click", () => {
-  editPanel.style.display =
-    editPanel.style.display === "none" ? "block" : "none";
-});
-
-// ----- SETTINGS -----
-const settings = JSON.parse(localStorage.getItem("siteSettings")) || {};
-
-// Load settings
-if (settings.title) title.textContent = settings.title;
-if (settings.bg) document.body.style.background = settings.bg;
-
-if (settings.buttonColor) {
-  document.querySelectorAll("button").forEach(btn => {
-    btn.style.background = settings.buttonColor;
-    btn.style.color = "white";
-  });
-}
-
-// TITLE CHANGE
-titleInput.addEventListener("input", () => {
-  settings.title = titleInput.value;
-  title.textContent = titleInput.value;
-  localStorage.setItem("siteSettings", JSON.stringify(settings));
-});
-
-// BACKGROUND COLOUR
-bgPicker.addEventListener("change", () => {
-  settings.bg = bgPicker.value;
-  document.body.style.background = settings.bg;
-  localStorage.setItem("siteSettings", JSON.stringify(settings));
-});
-
-// BUTTON COLOUR
-buttonPicker.addEventListener("change", () => {
-  settings.buttonColor = buttonPicker.value;
-  document.querySelectorAll("button").forEach(btn => {
-    btn.style.background = settings.buttonColor;
-  });
-  localStorage.setItem("siteSettings", JSON.stringify(settings));
-});
-
-// EMOJI
-applyEmoji.addEventListener("click", () => {
-  if (emojiInput.value) {
-    settings.emoji = emojiInput.value;
-    title.textContent = settings.emoji + " " + (settings.title || "Quote of the Day");
-    localStorage.setItem("siteSettings", JSON.stringify(settings));
-  }
-});
 
   </script>
   
