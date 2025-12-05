@@ -4,71 +4,89 @@
   <meta charset="UTF-8" />
   <title>My Quote of the Day</title>
   <style>
-    body {
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #f5f5f5;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      min-height: 100vh;
-      align-items: center;
-      justify-content: center;
-    }
+  body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+  background: linear-gradient(to bottom, #f2f2f7, #ffffff);
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 
-    .card {
-      background: white;
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-      max-width: 420px;
-      width: 100%;
-      text-align: center;
-    }
+.card {
+  background: rgba(255,255,255,0.8);
+  backdrop-filter: blur(20px);
+  padding: 24px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+  max-width: 420px;
+  width: 92%;
+  text-align: center;
+}
+<hr style="margin:1rem 0">
 
-    h1 {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-    }
+<h3 style="font-weight:600;">Appearance</h3>
 
-    #quote {
-      font-size: 1rem;
-      line-height: 1.5;
-      margin-bottom: 1.5rem;
-      color: #333;
-      min-height: 3em;
-    }
+<input type="color" id="bgPicker"> Background
+<br><br>
 
-    button {
-      padding: 0.6rem 1.2rem;
-      border-radius: 999px;
-      border: none;
-      cursor: pointer;
-      font-size: 0.95rem;
-      font-weight: 600;
-      background: #111827;
-      color: white;
-      margin: 0.25rem;
-    }
+<input type="color" id="buttonPicker"> Button colour
+<br><br>
 
-    button:hover {
-      opacity: 0.9;
-    }
+<input type="file" id="imagePicker" accept="image/*">
+<br><br>
 
-    textarea {
-      font-family: inherit;
-      font-size: 0.9rem;
-      padding: 0.5rem;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      resize: vertical;
-    }
+<input type="text" id="emojiInput" placeholder="Add emoji to title 😊">
+<br>
+<button id="applyEmoji">Apply emoji</button>
 
-    #saved {
-      min-height: 1.2em;
-      font-size: 0.9rem;
-      color: #555;
-      margin-top: 0.5rem;
-    }
+h1 {
+  font-weight: 600;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+}
+
+#quote {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 1rem 0 1.5rem;
+  color: #1c1c1e;
+}
+
+button {
+  border: none;
+  padding: 0.7rem 1.4rem;
+  border-radius: 999px;
+  background: #007aff;
+  color: white;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin: 0.2rem;
+  box-shadow: 0 6px 12px rgba(0,122,255,0.2);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+button:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 8px rgba(0,122,255,0.15);
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 14px;
+  border: 1px solid #ddd;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+#saved {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
   </style>
 </head>
 <body>
@@ -257,6 +275,70 @@ deleteButton.addEventListener("click", () => {
 // ---- NAVIGATION ----
 viewButton.addEventListener("click", () => window.location.href = "favourite.html");
 binButton.addEventListener("click", () => window.location.href = "bin.html");
+const bgPicker = document.getElementById("bgPicker");
+const buttonPicker = document.getElementById("buttonPicker");
+const imagePicker = document.getElementById("imagePicker");
+const emojiInput = document.getElementById("emojiInput");
+const applyEmoji = document.getElementById("applyEmoji");
+const title = document.querySelector("h1");
+// ---- LOAD SETTINGS ----
+const settings = JSON.parse(localStorage.getItem("siteSettings")) || {};
+
+if (settings.bg) document.body.style.background = settings.bg;
+
+if (settings.buttonColor) {
+  document.querySelectorAll("button").forEach(b => {
+    b.style.background = settings.buttonColor;
+  });
+}
+
+if (settings.image) {
+  document.body.style.background = `url(${settings.image}) center / cover no-repeat`;
+}
+
+if (settings.emoji) {
+  title.textContent = settings.emoji + " Quote of the Day";
+}
+
+// ---- SAVE BACKGROUND COLOUR ----
+bgPicker.addEventListener("change", () => {
+  settings.bg = bgPicker.value;
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+  document.body.style.background = settings.bg;
+});
+
+// ---- SAVE BUTTON COLOUR ----
+buttonPicker.addEventListener("change", () => {
+  settings.buttonColor = buttonPicker.value;
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+  document.querySelectorAll("button").forEach(b => {
+    b.style.background = settings.buttonColor;
+  });
+});
+
+// ---- IMAGE UPLOAD ----
+imagePicker.addEventListener("change", () => {
+  const file = imagePicker.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    settings.image = e.target.result;
+    localStorage.setItem("siteSettings", JSON.stringify(settings));
+    document.body.style.background = `url(${settings.image}) center / cover no-repeat`;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+// ---- TITLE EMOJI ----
+applyEmoji.addEventListener("click", () => {
+  const emoji = emojiInput.value.trim();
+  if (emoji) {
+    settings.emoji = emoji;
+    localStorage.setItem("siteSettings", JSON.stringify(settings));
+    title.textContent = emoji + " Quote of the Day";
+  }
+});
 
   </script>
 </body>
