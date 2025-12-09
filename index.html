@@ -329,6 +329,10 @@ const title = document.querySelector("h1");
 const settings = JSON.parse(localStorage.getItem("siteSettings")) || {};
 if (settings.title) title.textContent = settings.title;
 if (settings.bg) document.body.style.background = settings.bg;
+    if (settings.image) {
+  document.body.style.background = `url(${settings.image}) center / cover no-repeat fixed`;
+}
+
 if (settings.buttonColor) document.querySelectorAll("button").forEach(b => b.style.background = settings.buttonColor);
 if (settings.emoji) title.textContent = settings.emoji + " " + (settings.title || "Quote of the Day");
 
@@ -352,6 +356,9 @@ buttonPicker.addEventListener("change", () => {
   settings.buttonColor = buttonPicker.value;
   document.querySelectorAll("button").forEach(b => b.style.background = settings.buttonColor);
   localStorage.setItem("siteSettings", JSON.stringify(settings));
+  const imagePicker = document.getElementById("imagePicker");
+const removeImage = document.getElementById("removeImage");
+
 });
 
 applyEmoji.addEventListener("click", () => {
@@ -359,6 +366,28 @@ applyEmoji.addEventListener("click", () => {
   settings.emoji = emojiInput.value;
   title.textContent = settings.emoji + " " + (settings.title || "Quote of the Day");
   localStorage.setItem("siteSettings", JSON.stringify(settings));
+});
+// ---- IMAGE UPLOAD ----
+imagePicker.addEventListener("change", () => {
+  const file = imagePicker.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function (e) {
+    settings.image = e.target.result;
+    localStorage.setItem("siteSettings", JSON.stringify(settings));
+    document.body.style.background = `url(${settings.image}) center / cover no-repeat fixed`;
+  };
+
+  reader.readAsDataURL(file);
+});
+
+// ---- REMOVE IMAGE ----
+removeImage.addEventListener("click", () => {
+  delete settings.image;
+  localStorage.setItem("siteSettings", JSON.stringify(settings));
+  document.body.style.background = settings.bg || "#ffffff";
 });
 
 
