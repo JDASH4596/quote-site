@@ -389,6 +389,21 @@ removeImage.addEventListener("click", () => {
   localStorage.setItem("siteSettings", JSON.stringify(settings));
   document.body.style.background = settings.bg || "#ffffff";
 });
+const imagePicker = document.getElementById("imagePicker");
+
+if (imagePicker) {
+  imagePicker.addEventListener("change", () => {
+    const file = imagePicker.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      document.body.style.background = `url(${e.target.result}) center / cover no-repeat fixed`;
+      alert("This preview is only for YOU. To make it permanent upload the image to GitHub.");
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 
   </script>
